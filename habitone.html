@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HabitOne</title>
+<!-- SEO & descrizione -->
+<meta name="description" content="Rispondi a 5 domande e scopri l'unica abitudine da costruire adesso. Piano personalizzato per 7 giorni, generato dall'AI." />
+
+<!-- Open Graph — anteprima quando condividi il link su WhatsApp, social, ecc. -->
+<meta property="og:title"       content="HabitOne — La tua prossima abitudine inizia qui" />
+<meta property="og:description" content="5 domande. 1 abitudine. 7 giorni. Generata dall'AI su misura per te." />
+<meta property="og:type"        content="website" />
+
+<!-- iOS: nasconde la barra del browser quando salvata come app -->
+<meta name="apple-mobile-web-app-capable"       content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+<!-- Favicon SVG inline — nessun file extra necessario -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%234E7A52'/><text x='50%' y='50%' font-size='72' text-anchor='middle' dominant-baseline='central' fill='%23D4AF37'>◆</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ══════════════════ VARIABILI ══════════════════ */
+:root {
+  --sage:        #7A9E7E;
+  --sage-lt:     #A8C5AC;
+  --sage-dk:     #4E7A52;
+  --gold:        #C8A96E;
+  --gold-lt:     #E8D5A3;
+  --cream:       #FAFAF7;
+  --parchment:   #F2EFE7;
+  --parchment-dk:#E8E3D8;
+  --ink:         #2C2C2A;
+  --ink-lt:      #4A4A47;
+  --mist:        #8A8A84;
+  --white:       #FFFFFF;
+  --error:       #C0614A;
+  --error-bg:    #FDF0ED;
+  --font-display:'Cormorant Garamond', Georgia, serif;
+  --font-body:   'DM Sans', sans-serif;
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2.5rem;
+  --space-2xl: 4rem;
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-pill:999px;
+  --shadow-sm:  0 2px 8px rgba(44,44,42,.08);
+  --ease-out:   cubic-bezier(.22,1,.36,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --duration:   .4s;
+}
+
+/* ══════════════════ RESET ══════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { font-size:16px; scroll-behavior:smooth; }
+body { font-family:var(--font-body); background-color:var(--cream); color:var(--ink); line-height:1.6; min-height:100dvh; overflow-x:hidden; }
+button { font-family:inherit; cursor:pointer; border:none; background:none; }
+::selection { background:var(--gold-lt); color:var(--ink); }
+
+/* ══════════════════ SCREENS ══════════════════ */
+.screen { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--space-lg); opacity:0; visibility:hidden; transform:translateY(20px); transition:opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out), visibility 0s var(--duration); pointer-events:none; overflow-y:auto; }
+.screen.active { opacity:1; visibility:visible; transform:translateY(0); transition:opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out); pointer-events:all; }
+.screen.exiting { opacity:0; transform:translateY(-20px); transition:opacity .3s var(--ease-out), transform .3s var(--ease-out); }
+
+/* ══════════════════ HERO ══════════════════ */
+#screen-hero { background:var(--cream); }
+.hero-bg-decor { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+.circle { position:absolute; border-radius:50%; opacity:.12; }
+.c1 { width:600px; height:600px; background:radial-gradient(circle,var(--sage) 0%,transparent 70%); top:-200px; right:-150px; animation:float 8s ease-in-out infinite; }
+.c2 { width:400px; height:400px; background:radial-gradient(circle,var(--gold) 0%,transparent 70%); bottom:-100px; left:-100px; animation:float 10s ease-in-out infinite reverse; }
+.c3 { width:250px; height:250px; background:radial-gradient(circle,var(--sage-lt) 0%,transparent 70%); top:40%; left:10%; opacity:.08; animation:float 6s ease-in-out infinite 2s; }
+.hero-content { position:relative; z-index:1; max-width:580px; text-align:center; animation:heroEntrance 1s var(--ease-out) forwards; }
+.logo-wrap { display:inline-flex; align-items:center; gap:var(--space-sm); margin-bottom:var(--space-xl); font-family:var(--font-display); font-weight:600; font-size:1.1rem; letter-spacing:.08em; text-transform:uppercase; color:var(--sage-dk); }
+.logo-leaf { color:var(--gold); font-size:.7em; animation:pulse 3s ease-in-out infinite; }
+.hero-title { font-family:var(--font-display); font-size:clamp(2.8rem,6vw,4.5rem); font-weight:400; line-height:1.1; color:var(--ink); margin-bottom:var(--space-lg); letter-spacing:-.02em; }
+.hero-title em { font-style:italic; color:var(--sage-dk); position:relative; }
+.hero-title em::after { content:''; position:absolute; left:0; bottom:2px; width:100%; height:2px; background:var(--gold); opacity:.6; border-radius:2px; }
+.hero-sub { font-size:1.05rem; color:var(--ink-lt); font-weight:300; line-height:1.8; margin-bottom:var(--space-xl); }
+.hero-sub strong { color:var(--ink); font-weight:500; }
+.hero-badge { display:inline-flex; align-items:center; gap:var(--space-sm); background:var(--parchment); border:1px solid var(--parchment-dk); border-radius:var(--radius-pill); padding:var(--space-sm) var(--space-md); font-size:.85rem; color:var(--mist); margin-bottom:var(--space-xl); }
+.badge-dot { width:8px; height:8px; background:var(--sage); border-radius:50%; animation:pulse 2s ease-in-out infinite; flex-shrink:0; }
+
+/* ══════════════════ QUIZ ══════════════════ */
+#screen-quiz { background:var(--cream); align-items:flex-start; padding:0; }
+.quiz-container { width:100%; max-width:660px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; padding:var(--space-xl) var(--space-lg); }
+.quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-lg); }
+.logo-small { font-family:var(--font-display); font-weight:600; font-size:1rem; letter-spacing:.06em; color:var(--sage-dk); display:flex; align-items:center; gap:6px; }
+.logo-small .logo-leaf { font-size:.65em; color:var(--gold); }
+.progress-label { font-size:.85rem; color:var(--mist); font-weight:400; }
+.progress-label span { color:var(--ink); font-weight:500; }
+.progress-bar-wrap { height:4px; background:var(--parchment-dk); border-radius:var(--radius-pill); margin-bottom:var(--space-2xl); overflow:hidden; }
+.progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--sage),var(--gold)); border-radius:var(--radius-pill); width:20%; transition:width .5s var(--ease-out); }
+.question-area { flex:1; }
+.q-number { font-family:var(--font-display); font-size:4.5rem; font-weight:600; color:var(--parchment-dk); line-height:1; margin-bottom:var(--space-md); letter-spacing:-.03em; user-select:none; }
+.q-text { font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem); font-weight:400; line-height:1.3; color:var(--ink); margin-bottom:var(--space-xl); letter-spacing:-.01em; }
+.options-grid { display:grid; grid-template-columns:1fr; gap:var(--space-sm); }
+.option-btn { display:flex; align-items:center; gap:var(--space-md); padding:var(--space-md) var(--space-lg); background:var(--white); border:1.5px solid var(--parchment-dk); border-radius:var(--radius-md); cursor:pointer; text-align:left; font-family:var(--font-body); font-size:1rem; color:var(--ink-lt); font-weight:400; transition:border-color .2s, background .2s, transform .15s var(--ease-spring), box-shadow .2s; }
+.option-indicator { width:20px; height:20px; border-radius:50%; border:2px solid var(--parchment-dk); flex-shrink:0; transition:border-color .2s, background .2s; position:relative; }
+.option-text { flex:1; line-height:1.4; }
+.option-emoji { font-size:1.3rem; flex-shrink:0; filter:grayscale(30%); transition:filter .2s; }
+.option-btn:hover { border-color:var(--sage-lt); background:var(--parchment); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.option-btn:hover .option-indicator { border-color:var(--sage-lt); }
+.option-btn:hover .option-emoji { filter:grayscale(0%); }
+.option-btn.selected { border-color:var(--sage-dk); background:linear-gradient(135deg,rgba(122,158,126,.08),rgba(200,169,110,.05)); color:var(--ink); font-weight:500; transform:translateY(-1px); box-shadow:0 4px 16px rgba(78,122,82,.15); }
+.option-btn.selected .option-indicator { background:var(--sage-dk); border-color:var(--sage-dk); }
+.option-btn.selected .option-indicator::after { content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:white; font-size:.65rem; font-weight:700; }
+.option-btn.selected .option-emoji { filter:grayscale(0%); }
+.quiz-footer { display:flex; justify-content:space-between; align-items:center; padding-top:var(--space-xl); margin-top:auto; }
+.btn-back { font-size:.9rem; color:var(--mist); font-weight:400; padding:var(--space-sm) var(--space-md); border-radius:var(--radius-sm); transition:color .2s, transform .15s; }
+.btn-back:hover { color:var(--ink); transform:translateX(-2px); }
+.btn-back.hidden { visibility:hidden; pointer-events:none; }
+.btn-next { display:inline-flex; align-items:center; gap:var(--space-sm); padding:.85rem var(--space-xl); background:var(--sage-dk); color:var(--white); border-radius:var(--radius-pill); font-size:1rem; font-weight:500; letter-spacing:.02em; transition:background .2s, transform .15s var(--ease-spring), opacity .2s; min-width:140px; justify-content:center; }
+.btn-next:hover:not(:disabled) { background:var(--sage); transform:translateY(-2px) scale(1.02); }
+.btn-next:active:not(:disabled) { transform:scale(.97); }
+.btn-next:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+.question-area.slide-out-left  { animation:slideOutLeft .3s var(--ease-out) forwards; }
+.question-area.slide-in-right  { animation:slideInRight .35s var(--ease-out) forwards; }
+.question-area.slide-out-right { animation:slideOutRight .3s var(--ease-out) forwards; }
+.question-area.slide-in-left   { animation:slideInLeft .35s var(--ease-out) forwards; }
+
+/* ══════════════════ LOADING ══════════════════ */
+#screen-loading { background:var(--parchment); }
+.loading-container { text-align:center; max-width:400px; }
+.loader-ring { position:relative; width:90px; height:90px; margin:0 auto var(--space-xl); }
+.ring-inner { width:100%; height:100%; border-radius:50%; border:3px solid var(--parchment-dk); border-top-color:var(--sage); border-right-color:var(--gold); animation:spin 1.4s linear infinite; }
+.loader-leaf { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--sage-dk); animation:pulse 2s ease-in-out infinite; }
+.loading-title { font-family:var(--font-display); font-size:1.8rem; font-weight:400; color:var(--ink); margin-bottom:var(--space-md); }
+.loading-sub { color:var(--mist); font-size:.95rem; font-weight:300; margin-bottom:var(--space-xl); min-height:1.5em; transition:opacity .4s; }
+.loading-dots { display:flex; justify-content:center; gap:6px; }
+.loading-dots span { width:8px; height:8px; background:var(--sage-lt); border-radius:50%; animation:dotBounce 1.4s ease-in-out infinite; }
+.loading-dots span:nth-child(2) { animation-delay:.2s; }
+.loading-dots span:nth-child(3) { animation-delay:.4s; }
+
+/* ══════════════════ RISULTATO ══════════════════ */
+#screen-result { background:var(--cream); align-items:flex-start; padding:0; }
+
+.result-container { width:100%; max-width:680px; margin:0 auto; padding:var(--space-xl) var(--space-lg) var(--space-2xl); }
+
+.result-header { text-align:center; margin-bottom:var(--space-xl); padding-top:var(--space-lg); }
+
+.result-badge { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,var(--sage-dk),var(--sage)); color:var(--white); padding:var(--space-sm) var(--space-lg); border-radius:var(--radius-pill); font-size:.85rem; font-weight:500; letter-spacing:.04em; }
+
+/* Card abitudine principale */
+.habit-card { background:var(--white); border:1.5px solid var(--parchment-dk); border-radius:var(--radius-lg); padding:var(--space-xl); margin-bottom:var(--space-lg); text-align:center; position:relative; overflow:hidden; animation:cardEntrance .5s var(--ease-out) forwards; }
+.habit-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--sage),var(--gold)); }
+.habit-emoji-big { font-size:3.5rem; display:block; margin-bottom:var(--space-md); animation:emojiPop .6s var(--ease-spring) .2s both; }
+.habit-name { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.4rem); font-weight:600; color:var(--ink); margin-bottom:var(--space-md); line-height:1.2; }
+.habit-explanation { font-size:.98rem; color:var(--ink-lt); font-weight:300; line-height:1.8; max-width:520px; margin:0 auto; }
+
+/* Sezione 7 giorni */
+.section-title { font-family:var(--font-display); font-size:1.5rem; font-weight:400; color:var(--ink); margin-bottom:var(--space-md); display:flex; align-items:center; gap:var(--space-sm); }
+.section-title::after { content:''; flex:1; height:1px; background:var(--parchment-dk); margin-left:var(--space-sm); }
+
+.days-grid { display:grid; grid-template-columns:1fr; gap:var(--space-sm); margin-bottom:var(--space-lg); }
+
+/* Card singolo giorno */
+.day-card { background:var(--white); border:1.5px solid var(--parchment-dk); border-radius:var(--radius-md); padding:var(--space-md) var(--space-lg); display:flex; align-items:flex-start; gap:var(--space-md); opacity:0; animation:cardEntrance .4s var(--ease-out) forwards; transition:border-color .2s, transform .2s var(--ease-spring); }
+.day-card:hover { border-color:var(--sage-lt); transform:translateX(4px); }
+.day-card:nth-child(1) { animation-delay:.05s; }
+.day-card:nth-child(2) { animation-delay:.10s; }
+.day-card:nth-child(3) { animation-delay:.15s; }
+.day-card:nth-child(4) { animation-delay:.20s; }
+.day-card:nth-child(5) { animation-delay:.25s; }
+.day-card:nth-child(6) { animation-delay:.30s; }
+.day-card:nth-child(7) { animation-delay:.35s; }
+
+.day-number-col { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:48px; padding-top:2px; flex-shrink:0; }
+.day-num { font-family:var(--font-display); font-size:1.4rem; font-weight:600; color:var(--sage-dk); line-height:1; }
+.day-label-small { font-size:.7rem; color:var(--mist); text-transform:uppercase; letter-spacing:.06em; }
+.day-divider { width:1px; background:var(--parchment-dk); align-self:stretch; flex-shrink:0; }
+.day-content { flex:1; min-width:0; }
+.day-header { display:flex; align-items:center; justify-content:space-between; gap:var(--space-sm); margin-bottom:4px; }
+.day-title-text { font-size:.95rem; font-weight:500; color:var(--ink); display:flex; align-items:center; gap:6px; }
+.day-duration { font-size:.75rem; color:var(--mist); background:var(--parchment); padding:2px 8px; border-radius:var(--radius-pill); white-space:nowrap; flex-shrink:0; }
+.day-task { font-size:.88rem; color:var(--ink-lt); line-height:1.6; font-weight:300; }
+
+/* Card consiglio */
+.tip-card { background:linear-gradient(135deg,rgba(78,122,82,.07),rgba(200,169,110,.05)); border:1.5px solid var(--sage-lt); border-radius:var(--radius-lg); padding:var(--space-lg) var(--space-xl); margin-bottom:var(--space-xl); display:flex; gap:var(--space-md); align-items:flex-start; animation:cardEntrance .4s var(--ease-out) .4s both; }
+.tip-icon { font-size:1.8rem; flex-shrink:0; line-height:1.2; }
+.tip-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:var(--sage-dk); font-weight:500; margin-bottom:4px; }
+.tip-text { font-size:.95rem; color:var(--ink-lt); line-height:1.7; font-weight:300; }
+
+/* Bottoni azione */
+.result-actions { display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap; animation:cardEntrance .4s var(--ease-out) .5s both; }
+
+.btn-copy { display:inline-flex; align-items:center; gap:var(--space-sm); padding:.85rem var(--space-xl); background:var(--ink); color:var(--white); border-radius:var(--radius-pill); font-size:.95rem; font-weight:500; letter-spacing:.02em; transition:background .2s, transform .15s var(--ease-spring); }
+.btn-copy:hover { background:var(--ink-lt); transform:translateY(-2px); }
+.btn-copy:active { transform:scale(.97); }
+.btn-copy.copied { background:var(--sage-dk); animation:copyFeedback .3s var(--ease-spring); }
+
+.btn-restart { display:inline-flex; align-items:center; gap:var(--space-sm); padding:.85rem var(--space-xl); background:transparent; color:var(--mist); border:1.5px solid var(--parchment-dk); border-radius:var(--radius-pill); font-size:.95rem; font-weight:400; transition:color .2s, border-color .2s, transform .15s var(--ease-spring); }
+.btn-restart:hover { color:var(--ink); border-color:var(--ink-lt); transform:translateY(-2px); }
+
+/* Errore */
+.error-box { background:var(--error-bg); border:1.5px solid rgba(192,97,74,.3); border-radius:var(--radius-md); padding:var(--space-lg); margin-bottom:var(--space-lg); text-align:center; display:none; }
+.error-box.visible { display:block; }
+.error-icon { font-size:2rem; margin-bottom:var(--space-sm); }
+.error-title { font-weight:500; color:var(--error); margin-bottom:var(--space-xs); }
+.error-msg { font-size:.9rem; color:var(--ink-lt); }
+
+/* Bottone shared */
+.btn-primary { display:inline-flex; align-items:center; gap:var(--space-md); padding:1rem 2.2rem; background:var(--sage-dk); color:var(--white); border-radius:var(--radius-pill); font-size:1.05rem; font-weight:500; letter-spacing:.02em; box-shadow:0 8px 24px rgba(78,122,82,.3); transition:background .2s, transform .2s var(--ease-spring), box-shadow .2s; }
+.btn-primary:hover { background:var(--sage); transform:translateY(-3px) scale(1.02); box-shadow:0 12px 32px rgba(78,122,82,.35); }
+.btn-primary:active { transform:scale(.97); }
+.btn-arrow { display:inline-block; transition:transform .2s var(--ease-spring); }
+.btn-primary:hover .btn-arrow, .btn-next:hover:not(:disabled) .btn-arrow { transform:translateX(4px); }
+
+/* ══════════════════ KEYFRAMES ══════════════════ */
+@keyframes heroEntrance  { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes float         { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+@keyframes spin          { to{transform:rotate(360deg)} }
+@keyframes pulse         { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(.9)} }
+@keyframes dotBounce     { 0%,80%,100%{transform:scale(1);opacity:.5} 40%{transform:scale(1.4);opacity:1} }
+@keyframes slideOutLeft  { to{opacity:0;transform:translateX(-40px)} }
+@keyframes slideInRight  { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+@keyframes slideOutRight { to{opacity:0;transform:translateX(40px)} }
+@keyframes slideInLeft   { from{opacity:0;transform:translateX(-40px)} to{opacity:1;transform:translateX(0)} }
+@keyframes cardEntrance  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes emojiPop      { from{opacity:0;transform:scale(0.4)} to{opacity:1;transform:scale(1)} }
+@keyframes copyFeedback  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+/* ══════════════════ RESPONSIVE ══════════════════ */
+@media (max-width:480px) {
+  .hero-title{font-size:2.4rem} .hero-sub{font-size:.95rem}
+  .quiz-container{padding:var(--space-lg) var(--space-md)} .q-number{font-size:3rem} .q-text{font-size:1.5rem}
+  .option-btn{padding:var(--space-md)}
+  .quiz-footer{flex-direction:column-reverse;gap:var(--space-md);align-items:stretch}
+  .btn-next{width:100%;justify-content:center} .btn-back{text-align:center}
+  .result-container{padding:var(--space-lg) var(--space-md) var(--space-2xl)}
+  .result-actions{flex-direction:column} .btn-copy,.btn-restart{width:100%;justify-content:center}
+  .day-card{padding:var(--space-md)} .habit-card{padding:var(--space-lg)}
+  .tip-card{flex-direction:column;gap:var(--space-sm)}
+}
+@media (min-width:600px) { .options-grid{grid-template-columns:1fr 1fr} }
+@media (min-width:820px) { .days-grid{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<section id="screen-hero" class="screen">
+  <div class="hero-bg-decor" aria-hidden="true">
+    <div class="circle c1"></div><div class="circle c2"></div><div class="circle c3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="logo-wrap"><span class="logo-leaf" aria-hidden="true">◆</span><span>HabitOne</span></div>
+    <h1 class="hero-title">La tua prossima<br /><em>abitudine</em> inizia qui.</h1>
+    <p class="hero-sub">Rispondi a 5 brevi domande sul tuo stile di vita.<br />L'AI sceglierà <strong>un'unica abitudine</strong> su misura per te,<br />con un piano pratico per i primi <strong>7 giorni</strong>.</p>
+    <div class="hero-badge"><span class="badge-dot"></span>Ci vogliono meno di 2 minuti</div>
+    <button class="btn-primary" id="btn-start">Inizia ora <span class="btn-arrow">→</span></button>
+  </div>
+</section>
+
+<!-- ═══ QUIZ ═══ -->
+<section id="screen-quiz" class="screen">
+  <div class="quiz-container">
+    <header class="quiz-header">
+      <div class="logo-small"><span class="logo-leaf" aria-hidden="true">◆</span>HabitOne</div>
+      <div class="progress-label">Domanda <span id="q-current">1</span> di <span id="q-total">5</span></div>
+    </header>
+    <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="question-area" id="question-area">
+      <div class="q-number" id="q-number">01</div>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="options-grid" id="options-grid"></div>
+    </div>
+    <footer class="quiz-footer">
+      <button class="btn-back hidden" id="btn-back">← Indietro</button>
+      <button class="btn-next" id="btn-next" disabled>
+        <span id="btn-next-label">Avanti</span><span class="btn-arrow">→</span>
+      </button>
+    </footer>
+  </div>
+</section>
+
+<!-- ═══ LOADING ═══ -->
+<section id="screen-loading" class="screen">
+  <div class="loading-container">
+    <div class="loader-ring" aria-hidden="true"><div class="ring-inner"></div><span class="loader-leaf">◆</span></div>
+    <h2 class="loading-title">Sto analizzando le tue risposte…</h2>
+    <p class="loading-sub" id="loading-sub">Cerco l'abitudine perfetta per te</p>
+    <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+</section>
+
+<!-- ═══ RISULTATO ═══ -->
+<section id="screen-result" class="screen">
+  <div class="result-container">
+    <div class="result-header">
+      <div class="result-badge">◆ La tua abitudine personalizzata</div>
+    </div>
+
+    <!-- Errore (nascosto di default) -->
+    <div class="error-box" id="error-box">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">Qualcosa è andato storto</div>
+      <div class="error-msg" id="error-msg">Riprova tra qualche secondo.</div>
+    </div>
+
+    <!-- Card abitudine -->
+    <div class="habit-card" id="habit-card" style="display:none">
+      <span class="habit-emoji-big" id="habit-emoji">🌱</span>
+      <h2 class="habit-name" id="habit-name">—</h2>
+      <p class="habit-explanation" id="habit-explanation">—</p>
+    </div>
+
+    <!-- Piano 7 giorni -->
+    <div id="week-section" style="display:none">
+      <div class="section-title">📅 Il tuo piano per 7 giorni</div>
+      <div class="days-grid" id="days-grid"></div>
+    </div>
+
+    <!-- Consiglio -->
+    <div class="tip-card" id="tip-card" style="display:none">
+      <div class="tip-icon">💡</div>
+      <div class="tip-body">
+        <div class="tip-label">Come non mollare</div>
+        <div class="tip-text" id="tip-text">—</div>
+      </div>
+    </div>
+
+    <!-- Bottoni azione -->
+    <div class="result-actions">
+      <button class="btn-copy" id="btn-copy"><span id="btn-copy-label">📋 Copia il mio piano</span></button>
+      <button class="btn-restart" id="btn-restart">↺ Ricomincia</button>
+    </div>
+  </div>
+</section>
+
+
+<script>
+/*
+══════════════════════════════════════════════════════════
+  CONFIGURAZIONE — UNICA COSA DA CAMBIARE
+  Se il server gira su porta diversa o è online,
+  aggiorna questa riga:
+══════════════════════════════════════════════════════════
+*/
+const API_URL = 'http://habitone-production.up.railway.app/api/habit';
+
+/* ── DOMANDE ── */
+const questions = [
+  { id:'goal', text:'Qual è il tuo obiettivo principale in questo momento?', options:[
+    {value:'salute',       label:'Migliorare la salute fisica',        emoji:'💪'},
+    {value:'mente',        label:'Ridurre stress e ansia',             emoji:'🧘'},
+    {value:'produttivita', label:'Essere più produttivo',              emoji:'🎯'},
+    {value:'crescita',     label:'Crescita personale e apprendimento', emoji:'📚'},
+  ]},
+  { id:'time', text:'Quanto tempo puoi dedicare ogni giorno a una nuova abitudine?', options:[
+    {value:'5min',       label:'Solo 5–10 minuti',            emoji:'⚡'},
+    {value:'15min',      label:'15–20 minuti',                 emoji:'🌤️'},
+    {value:'30min',      label:"Mezz'ora o più",               emoji:'🕐'},
+    {value:'flessibile', label:'Varia molto, sono flessibile', emoji:'🌊'},
+  ]},
+  { id:'energy', text:'In quale momento della giornata ti senti più energico?', options:[
+    {value:'mattina',    label:'Mattina presto', emoji:'🌅'},
+    {value:'meta',       label:'Metà mattina',   emoji:'☀️'},
+    {value:'pomeriggio', label:'Pomeriggio',     emoji:'🌤️'},
+    {value:'sera',       label:'Sera',           emoji:'🌙'},
+  ]},
+  { id:'obstacle', text:'Qual è il tuo ostacolo più grande nel costruire nuove abitudini?', options:[
+    {value:'motivazione', label:'Perdo la motivazione presto', emoji:'😔'},
+    {value:'tempo',       label:'Non ho abbastanza tempo',      emoji:'⏳'},
+    {value:'costanza',    label:'Dimentico o salto giorni',     emoji:'😅'},
+    {value:'troppi',      label:'Voglio fare troppo insieme',   emoji:'🤯'},
+  ]},
+  { id:'lifestyle', text:'Come descriveresti il tuo stile di vita attuale?', options:[
+    {value:'sedentario', label:'Prevalentemente sedentario', emoji:'🛋️'},
+    {value:'moderato',   label:'Abbastanza attivo',          emoji:'🚶'},
+    {value:'attivo',     label:'Molto attivo e dinamico',    emoji:'🏃'},
+    {value:'caotico',    label:'Caotico e irregolare',       emoji:'🌪️'},
+  ]},
+];
+
+/* ── STATO ── */
+const state = { currentQuestion:0, answers:{}, habitData:null, _timer:null };
+
+/* ── DOM ── */
+const screens = {
+  hero:    document.getElementById('screen-hero'),
+  quiz:    document.getElementById('screen-quiz'),
+  loading: document.getElementById('screen-loading'),
+  result:  document.getElementById('screen-result'),
+};
+const ui = {
+  btnStart:        document.getElementById('btn-start'),
+  btnNext:         document.getElementById('btn-next'),
+  btnNextLabel:    document.getElementById('btn-next-label'),
+  btnBack:         document.getElementById('btn-back'),
+  btnRestart:      document.getElementById('btn-restart'),
+  btnCopy:         document.getElementById('btn-copy'),
+  btnCopyLabel:    document.getElementById('btn-copy-label'),
+  progressFill:    document.getElementById('progress-fill'),
+  qCurrent:        document.getElementById('q-current'),
+  qTotal:          document.getElementById('q-total'),
+  questionArea:    document.getElementById('question-area'),
+  qNumber:         document.getElementById('q-number'),
+  qText:           document.getElementById('q-text'),
+  optionsGrid:     document.getElementById('options-grid'),
+  loadingSub:      document.getElementById('loading-sub'),
+  errorBox:        document.getElementById('error-box'),
+  errorMsg:        document.getElementById('error-msg'),
+  habitCard:       document.getElementById('habit-card'),
+  habitEmoji:      document.getElementById('habit-emoji'),
+  habitName:       document.getElementById('habit-name'),
+  habitExplan:     document.getElementById('habit-explanation'),
+  weekSection:     document.getElementById('week-section'),
+  daysGrid:        document.getElementById('days-grid'),
+  tipCard:         document.getElementById('tip-card'),
+  tipText:         document.getElementById('tip-text'),
+};
+
+/* ── NAVIGAZIONE ── */
+function showScreen(name) {
+  const cur = document.querySelector('.screen.active');
+  if (cur) { cur.classList.add('exiting'); setTimeout(() => cur.classList.remove('active','exiting'), 300); }
+  setTimeout(() => { screens[name].classList.add('active'); screens[name].scrollTop = 0; }, cur ? 250 : 0);
+}
+
+/* ── QUIZ ── */
+function initQuiz() {
+  state.currentQuestion = 0; state.answers = {}; state.habitData = null;
+  ui.qTotal.textContent = questions.length;
+  renderQuestion(0, 'forward');
+  showScreen('quiz');
+}
+
+function renderQuestion(index, direction) {
+  const q = questions[index];
+  ui.progressFill.style.width = ((index+1)/questions.length*100) + '%';
+  ui.qCurrent.textContent = index+1;
+  document.querySelector('.progress-bar-wrap').setAttribute('aria-valuenow', index+1);
+  index === 0 ? ui.btnBack.classList.add('hidden') : ui.btnBack.classList.remove('hidden');
+  ui.btnNextLabel.textContent = index === questions.length-1 ? 'Scopri la tua abitudine' : 'Avanti';
+  animateQuestion(direction, () => {
+    ui.qNumber.textContent = String(index+1).padStart(2,'0');
+    ui.qText.textContent = q.text;
+    ui.optionsGrid.innerHTML = '';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn'; btn.dataset.value = opt.value;
+      btn.innerHTML = `<span class="option-indicator" aria-hidden="true"></span><span class="option-emoji" aria-hidden="true">${opt.emoji}</span><span class="option-text">${opt.label}</span>`;
+      if (state.answers[q.id] === opt.value) btn.classList.add('selected');
+      btn.addEventListener('click', () => selectOption(q.id, opt.value, btn));
+      ui.optionsGrid.appendChild(btn);
+    });
+    ui.btnNext.disabled = !state.answers[q.id];
+  });
+}
+
+function animateQuestion(direction, onSwap) {
+  const area = ui.questionArea;
+  const out = direction==='forward' ? 'slide-out-left' : 'slide-out-right';
+  const inn = direction==='forward' ? 'slide-in-right'  : 'slide-in-left';
+  area.classList.add(out);
+  setTimeout(() => {
+    area.classList.remove(out); onSwap(); area.classList.add(inn);
+    area.addEventListener('animationend', () => area.classList.remove(inn), {once:true});
+  }, 300);
+}
+
+function selectOption(qId, value, btn) {
+  ui.optionsGrid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected'); state.answers[qId] = value; ui.btnNext.disabled = false;
+  if (window.matchMedia('(max-width:600px)').matches) {
+    clearTimeout(state._timer);
+    state._timer = setTimeout(() => { if (state.answers[questions[state.currentQuestion].id]) advanceQuestion(); }, 450);
+  }
+}
+
+function advanceQuestion() {
+  if (!state.answers[questions[state.currentQuestion].id]) return;
+  if (state.currentQuestion === questions.length-1) { startLoading(); }
+  else { state.currentQuestion++; renderQuestion(state.currentQuestion, 'forward'); }
+}
+
+function goBack() {
+  if (state.currentQuestion === 0) return;
+  state.currentQuestion--; renderQuestion(state.currentQuestion, 'backward');
+}
+
+/* ════════════════════════════════════════════════
+   CHIAMATA API — il cuore dell'integrazione
+   ════════════════════════════════════════════════
+   Cosa succede qui:
+   1. Mostriamo la schermata loading
+   2. fetch() invia le risposte al nostro server Node.js
+   3. Il server chiama Gemini e ci risponde
+   4. Rendiamo il risultato come cards visive
+*/
+const loadingMsgs = ['Cerco l\'abitudine perfetta per te…','Analizzo il tuo stile di vita…','Costruisco il tuo piano per 7 giorni…','Quasi pronto…'];
+
+async function startLoading() {
+  showScreen('loading');
+  let i = 0;
+  ui.loadingSub.textContent = loadingMsgs[0];
+  const interval = setInterval(() => {
+    i = (i+1) % loadingMsgs.length;
+    ui.loadingSub.style.opacity = '0';
+    setTimeout(() => { ui.loadingSub.textContent = loadingMsgs[i]; ui.loadingSub.style.opacity = '1'; }, 200);
+  }, 1400);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers: state.answers })
+    });
+    const result = await response.json();
+    clearInterval(interval);
+
+    if (!response.ok || !result.success) {
+      showError(result.error || 'Errore sconosciuto dal server.');
+      return;
+    }
+    state.habitData = result.data;
+    renderResult(result.data);
+    showScreen('result');
+
+  } catch (err) {
+    clearInterval(interval);
+    showError('Non riesco a contattare il server. Assicurati che sia avviato con "node server.js".');
+  }
+}
+
+/* ── RENDERING RISULTATO ── */
+function showError(msg) {
+  ui.errorMsg.textContent = msg;
+  ui.errorBox.classList.add('visible');
+  ui.habitCard.style.display = ui.weekSection.style.display = ui.tipCard.style.display = 'none';
+  showScreen('result');
+}
+
+function renderResult(data) {
+  ui.errorBox.classList.remove('visible');
+
+  // Card abitudine
+  ui.habitEmoji.textContent = data.habit_emoji  || '🌱';
+  ui.habitName.textContent  = data.habit_name   || 'La tua abitudine';
+  ui.habitExplan.textContent = data.explanation  || '';
+  ui.habitCard.style.display = 'block';
+
+  // Piano 7 giorni
+  ui.daysGrid.innerHTML = '';
+  if (data.week_plan?.length) {
+    data.week_plan.forEach(day => {
+      const card = document.createElement('div');
+      card.className = 'day-card';
+      card.innerHTML = `
+        <div class="day-number-col">
+          <span class="day-num">${day.day}</span>
+          <span class="day-label-small">Giorno</span>
+        </div>
+        <div class="day-divider"></div>
+        <div class="day-content">
+          <div class="day-header">
+            <span class="day-title-text">${day.emoji||''} ${day.title||''}</span>
+            ${day.duration ? `<span class="day-duration">⏱ ${day.duration}</span>` : ''}
+          </div>
+          <div class="day-task">${day.task||''}</div>
+        </div>`;
+      ui.daysGrid.appendChild(card);
+    });
+    ui.weekSection.style.display = 'block';
+  }
+
+  // Consiglio
+  if (data.persistence_tip) {
+    ui.tipText.textContent = data.persistence_tip;
+    ui.tipCard.style.display = 'flex';
+  }
+}
+
+/* ════════════════════════════════════════════════
+   BOTTONE "COPIA IL MIO PIANO"
+   ════════════════════════════════════════════════
+   Costruisce una stringa di testo con tutto il piano
+   e la copia negli appunti con navigator.clipboard.
+   Il feedback visivo (✅ Copiato!) dura 2 secondi.
+*/
+function copyPlan() {
+  if (!state.habitData) return;
+  const d = state.habitData;
+  let text = `🌱 LA MIA ABITUDINE — HabitOne\n${'─'.repeat(34)}\n\n`;
+  text += `${d.habit_emoji} ${d.habit_name}\n\n${d.explanation}\n\n`;
+  text += `📅 PIANO 7 GIORNI\n${'─'.repeat(34)}\n`;
+  d.week_plan?.forEach(day => {
+    text += `\nGiorno ${day.day}: ${day.emoji} ${day.title}`;
+    if (day.duration) text += ` (${day.duration})`;
+    text += `\n${day.task}\n`;
+  });
+  if (d.persistence_tip) text += `\n💡 COME NON MOLLARE\n${'─'.repeat(34)}\n${d.persistence_tip}\n`;
+  text += `\n— Generato con HabitOne —`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    ui.btnCopyLabel.textContent = '✅ Copiato negli appunti!';
+    ui.btnCopy.classList.add('copied');
+    setTimeout(() => { ui.btnCopyLabel.textContent = '📋 Copia il mio piano'; ui.btnCopy.classList.remove('copied'); }, 2000);
+  }).catch(() => { alert('Copia manuale:\n\n' + text); });
+}
+
+/* ── RESTART ── */
+function restartApp() {
+  state.currentQuestion = 0; state.answers = {}; state.habitData = null;
+  ui.habitCard.style.display = ui.weekSection.style.display = ui.tipCard.style.display = 'none';
+  ui.errorBox.classList.remove('visible'); ui.daysGrid.innerHTML = '';
+  showScreen('hero');
+}
+
+/* ── LISTENERS ── */
+ui.btnStart.addEventListener('click', initQuiz);
+ui.btnNext.addEventListener('click', advanceQuestion);
+ui.btnBack.addEventListener('click', goBack);
+ui.btnRestart.addEventListener('click', restartApp);
+ui.btnCopy.addEventListener('click', copyPlan);
+document.addEventListener('keydown', e => {
+  if (document.querySelector('.screen.active')?.id === 'screen-quiz' && e.key === 'Enter' && !ui.btnNext.disabled) advanceQuestion();
+});
+
+/* ── AVVIO ── */
+showScreen('hero');
+</script>
+</body>
+</html>
